@@ -64,8 +64,8 @@ namespace Acme.Tools.EmailQueue
         /// <param name="adminCopy">If we must send a copy to the admin.</param>
         /// <param name="replyTo">The adresse to use in reply to.</param>
         /// <param name="attachments">The optional attachments.</param>
-        /// <returns>The task to wait.</returns>
-        public async Task EnqueueAsync(string sender, string title, string body, string recipient, bool adminCopy = false, string replyTo = null, params MailAttachment[] attachments)
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation, with the guid associated to the email.</returns>
+        public async Task<Guid> EnqueueAsync(string sender, string title, string body, string recipient, bool adminCopy = false, string replyTo = null, params MailAttachment[] attachments)
         {
             sender.ThrowIfNull(nameof(sender));
             title.ThrowIfNull(nameof(title));
@@ -90,6 +90,8 @@ namespace Acme.Tools.EmailQueue
 
             await context.QueuedEmails.AddAsync(mail);
             await context.SaveChangesAsync();
+
+            return mail.Id;
         }
 
         /// <summary>

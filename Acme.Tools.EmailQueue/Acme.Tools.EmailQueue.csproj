@@ -7,9 +7,10 @@
         <Description>Simple library to enque mails (internal usage, but public if anyone want to use or fork)</Description>
         <Copyright>Simon Baudart</Copyright>
         <PackageProjectUrl>https://github.com/simonbaudart/Acme.Tools.EmailQueue</PackageProjectUrl>
-        <PackageLicense>LICENSE</PackageLicense>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageIcon>logo.png</PackageIcon>
         <RepositoryUrl>https://github.com/simonbaudart/Acme.Tools.EmailQueue</RepositoryUrl>
+        <PackageVersion>1.0.1</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
