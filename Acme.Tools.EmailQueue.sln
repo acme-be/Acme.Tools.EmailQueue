@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acme.Tools.EmailQueue", "Acme.Tools.EmailQueue\Acme.Tools.EmailQueue.csproj", "{8069BBFB-075B-4CE5-8C0F-F86A7C95C14E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acme.Tools.EmailQueue.Tests", "Acme.Tools.EmailQueue.Tests\Acme.Tools.EmailQueue.Tests.csproj", "{EBE96753-F12B-4119-922D-9EC2050646FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{8069BBFB-075B-4CE5-8C0F-F86A7C95C14E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8069BBFB-075B-4CE5-8C0F-F86A7C95C14E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8069BBFB-075B-4CE5-8C0F-F86A7C95C14E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBE96753-F12B-4119-922D-9EC2050646FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBE96753-F12B-4119-922D-9EC2050646FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBE96753-F12B-4119-922D-9EC2050646FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBE96753-F12B-4119-922D-9EC2050646FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
