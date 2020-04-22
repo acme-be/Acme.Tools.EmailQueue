@@ -4,6 +4,12 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Authors>Acme</Authors>
+        <Description>Simple library to enque mails (internal usage, but public if anyone want to use or fork)</Description>
+        <Copyright>Simon Baudart</Copyright>
+        <PackageProjectUrl>https://github.com/simonbaudart/Acme.Tools.EmailQueue</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/simonbaudart/Acme.Tools.EmailQueue/blob/master/LICENSE</PackageLicenseUrl>
+        <PackageIconUrl>https://github.com/simonbaudart/Acme.Tools.EmailQueue/blob/master/logo.png</PackageIconUrl>
+        <RepositoryUrl>https://github.com/simonbaudart/Acme.Tools.EmailQueue</RepositoryUrl>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
