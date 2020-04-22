@@ -4,6 +4,8 @@
 
 namespace Acme.Tools.EmailQueue.Tests
 {
+    using System.IO;
+    using System.Net.Mail;
     using System.Threading.Tasks;
 
     using Xunit;
@@ -22,6 +24,28 @@ namespace Acme.Tools.EmailQueue.Tests
         {
             var service = new QueueMailService("Data Source=.;Initial Catalog=acme-queue-mail-tests;Integrated Security=True");
             await service.EnqueueAsync("acme@yopmail.com", "Unit Test : EnqueueOk", "This is a unit test !", "acme@yopmail.com");
+        }
+
+        /// <summary>
+        /// Test the sending of the mail queue.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public async Task SendQueuedMailsOk()
+        {
+            var service = new QueueMailService("Data Source=.;Initial Catalog=acme-queue-mail-tests;Integrated Security=True");
+
+            var smtpClient = new SmtpClient();
+            smtpClient.DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory;
+            smtpClient.PickupDirectoryLocation = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(smtpClient.PickupDirectoryLocation);
+
+            await service.EnqueueAsync("acme@yopmail.com", "Unit Test : EnqueueOk", "This is a unit test !", "acme@yopmail.com");
+            service.SendQueuedMails(smtpClient);
+
+            Assert.NotEmpty(Directory.GetFiles(smtpClient.PickupDirectoryLocation));
+
+            Directory.Delete(smtpClient.PickupDirectoryLocation, true);
         }
     }
 }
