@@ -7,8 +7,8 @@
         <Description>Simple library to enque mails (internal usage, but public if anyone want to use or fork)</Description>
         <Copyright>Simon Baudart</Copyright>
         <PackageProjectUrl>https://github.com/simonbaudart/Acme.Tools.EmailQueue</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/simonbaudart/Acme.Tools.EmailQueue/blob/master/LICENSE</PackageLicenseUrl>
-        <PackageIconUrl>https://github.com/simonbaudart/Acme.Tools.EmailQueue/blob/master/logo.png</PackageIconUrl>
+        <PackageLicense>LICENSE</PackageLicense>
+        <PackageIcon>logo.png</PackageIcon>
         <RepositoryUrl>https://github.com/simonbaudart/Acme.Tools.EmailQueue</RepositoryUrl>
     </PropertyGroup>
 
@@ -31,6 +31,17 @@
     <ItemGroup>
       <None Remove="stylecop.json" />
       <AdditionalFiles Include="stylecop.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="logo.png" Pack="true" PackagePath="">
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\LICENSE" Pack="true" PackagePath="">
+        <Link>LICENSE</Link>
+      </Content>
     </ItemGroup>
 
 </Project>
