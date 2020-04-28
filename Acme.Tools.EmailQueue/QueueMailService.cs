@@ -72,26 +72,27 @@ namespace Acme.Tools.EmailQueue
             body.ThrowIfNull(nameof(body));
             recipient.ThrowIfNull(nameof(recipient));
 
-            await using var context = new QueuedEmailContext(this.ConnectionString);
-
-            var mail = new QueuedEmail();
-            mail.Id = Guid.NewGuid();
-            mail.Sender = sender;
-            mail.Recipient = recipient;
-            mail.ReplyTo = replyTo;
-            mail.Subject = title;
-            mail.Body = body;
-            mail.AdminCopy = adminCopy;
-
-            if (attachments != null)
+            using (var context = new QueuedEmailContext(this.ConnectionString))
             {
-                mail.Attachments = JsonConvert.SerializeObject(attachments);
+                var mail = new QueuedEmail();
+                mail.Id = Guid.NewGuid();
+                mail.Sender = sender;
+                mail.Recipient = recipient;
+                mail.ReplyTo = replyTo;
+                mail.Subject = title;
+                mail.Body = body;
+                mail.AdminCopy = adminCopy;
+
+                if (attachments != null)
+                {
+                    mail.Attachments = JsonConvert.SerializeObject(attachments);
+                }
+
+                await context.QueuedEmails.AddAsync(mail);
+                await context.SaveChangesAsync();
+
+                return mail.Id;
             }
-
-            await context.QueuedEmails.AddAsync(mail);
-            await context.SaveChangesAsync();
-
-            return mail.Id;
         }
 
         /// <summary>
@@ -108,60 +109,62 @@ namespace Acme.Tools.EmailQueue
 
             lock (LockSendMails)
             {
-                using var context = new QueuedEmailContext(this.ConnectionString);
-                var emails = context.QueuedEmails.Where(x => x.Sent == null).ToList();
-                foreach (var email in emails)
+                using (var context = new QueuedEmailContext(this.ConnectionString))
                 {
-                    var message = new MailMessage();
-                    message.From = new MailAddress(email.Sender);
-                    message.Subject = email.Subject;
-                    message.Body = email.Body;
-                    message.IsBodyHtml = true;
-
-                    if (email.ReplyTo != null)
+                    var emails = context.QueuedEmails.Where(x => x.Sent == null).ToList();
+                    foreach (var email in emails)
                     {
-                        message.ReplyToList.Add(new MailAddress(email.ReplyTo));
-                    }
+                        var message = new MailMessage();
+                        message.From = new MailAddress(email.Sender);
+                        message.Subject = email.Subject;
+                        message.Body = email.Body;
+                        message.IsBodyHtml = true;
 
-                    message.To.Add(new MailAddress(email.Recipient));
-
-                    if (email.AdminCopy)
-                    {
-                        message.To.Add(new MailAddress(this.AdminEmail));
-                    }
-
-                    if (email.Attachments != null)
-                    {
-                        var attachments = JsonConvert.DeserializeObject<MailAttachment[]>(email.Attachments);
-                        foreach (var attachment in attachments)
+                        if (email.ReplyTo != null)
                         {
-                            var a = new Attachment(new MemoryStream(attachment.FileData), attachment.FileName);
-                            message.Attachments.Add(a);
+                            message.ReplyToList.Add(new MailAddress(email.ReplyTo));
                         }
-                    }
 
-                    foreach (var customHeaderKey in this.CustomHeaders.AllKeys)
-                    {
-                        message.Headers.Add(customHeaderKey, this.CustomHeaders[customHeaderKey]);
-                    }
+                        message.To.Add(new MailAddress(email.Recipient));
 
-                    try
-                    {
-                        client.Send(message);
-                        email.Sent = DateTime.Now;
-                        email.ResultMessage = null;
-
-                        if (waitTime != 0)
+                        if (email.AdminCopy)
                         {
-                            Thread.Sleep(waitTime);
+                            message.To.Add(new MailAddress(this.AdminEmail));
                         }
-                    }
-                    catch (SmtpException e)
-                    {
-                        email.ResultMessage = e.ToString();
-                    }
 
-                    context.SaveChanges();
+                        if (email.Attachments != null)
+                        {
+                            var attachments = JsonConvert.DeserializeObject<MailAttachment[]>(email.Attachments);
+                            foreach (var attachment in attachments)
+                            {
+                                var a = new Attachment(new MemoryStream(attachment.FileData), attachment.FileName);
+                                message.Attachments.Add(a);
+                            }
+                        }
+
+                        foreach (var customHeaderKey in this.CustomHeaders.AllKeys)
+                        {
+                            message.Headers.Add(customHeaderKey, this.CustomHeaders[customHeaderKey]);
+                        }
+
+                        try
+                        {
+                            client.Send(message);
+                            email.Sent = DateTime.Now;
+                            email.ResultMessage = null;
+
+                            if (waitTime != 0)
+                            {
+                                Thread.Sleep(waitTime);
+                            }
+                        }
+                        catch (SmtpException e)
+                        {
+                            email.ResultMessage = e.ToString();
+                        }
+
+                        context.SaveChanges();
+                    }
                 }
             }
         }
