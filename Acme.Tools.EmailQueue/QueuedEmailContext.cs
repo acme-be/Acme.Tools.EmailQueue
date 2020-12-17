@@ -12,7 +12,7 @@ namespace Acme.Tools.EmailQueue
     /// <summary>
     /// Represent a databse context for the queued emails.
     /// </summary>
-    public class QueuedEmailContext : DbContext
+    internal class QueuedEmailContext : DbContext
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="QueuedEmailContext" /> class.

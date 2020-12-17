@@ -1,13 +1,7 @@
 CREATE TABLE [acme].[QueuedEmails]
 (
     [Id]            [uniqueidentifier] NOT NULL,
-    [Sender]        [varchar](max)     NOT NULL,
-    [Recipient]     [varchar](max)     NOT NULL,
-    [ReplyTo]       [varchar](max)     NULL,
-    [Subject]       [varchar](max)     NOT NULL,
-    [Body]          [varchar](max)     NOT NULL,
-    [AdminCopy]     [bit]              NOT NULL,
-    [Attachments]   [varchar](max)     NULL,
+    [Email]        [varchar](max)     NOT NULL,
     [Created]       [datetime]         NOT NULL,
     [Sent]          [datetime]         NULL,
     [ResultMessage] [varchar](max)     NULL,

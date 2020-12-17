@@ -1,4 +1,4 @@
-﻿// <copyright file="MailAttachment.cs" company="Acme">
+﻿// <copyright file="EmailAttachment.cs" company="Acme">
 // Copyright (c) Acme. All rights reserved.
 // </copyright>
 
@@ -10,7 +10,7 @@ namespace Acme.Tools.EmailQueue
     /// <summary>
     /// Represent an attachment to the email.
     /// </summary>
-    public class MailAttachment
+    public class EmailAttachment
     {
         /// <summary>
         /// Gets or sets the file binary data.

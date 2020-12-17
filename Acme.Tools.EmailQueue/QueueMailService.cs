@@ -66,15 +66,14 @@ namespace Acme.Tools.EmailQueue
         /// <param name="replyTo">The adresse to use in reply to.</param>
         /// <param name="attachments">The optional attachments.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation, with the guid associated to the email.</returns>
-        public async Task<Guid> EnqueueAsync(string sender, string title, string body, string recipient, bool adminCopy = false, string replyTo = null, params MailAttachment[] attachments)
+        public async Task<Guid> EnqueueAsync(string sender, string title, string body, string recipient, bool adminCopy = false, string replyTo = null, params EmailAttachment[] attachments)
         {
             sender.ThrowIfNull(nameof(sender));
             title.ThrowIfNull(nameof(title));
             body.ThrowIfNull(nameof(body));
             recipient.ThrowIfNull(nameof(recipient));
 
-            var mail = new QueuedEmail();
-            mail.Id = Guid.NewGuid();
+            var mail = new Email();
             mail.Sender = sender;
             mail.Recipients = new List<string> { recipient };
             mail.ReplyTo = replyTo;
@@ -95,19 +94,18 @@ namespace Acme.Tools.EmailQueue
         /// </summary>
         /// <param name="mail">The mail to be enqueued.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation, with the guid associated to the email.</returns>
-        public async Task<Guid> EnqueueAsync(QueuedEmail mail)
+        public async Task<Guid> EnqueueAsync(Email mail)
         {
-            if (mail.Id == default(Guid))
-            {
-                mail.Id = Guid.NewGuid();
-            }
+            var queuedEmail = new QueuedEmail();
+            queuedEmail.Id = Guid.NewGuid();
+            queuedEmail.Email = JsonConvert.SerializeObject(mail, Formatting.Indented);
 
             using (var context = new QueuedEmailContext(this.ConnectionString))
             {
-                await context.QueuedEmails.AddAsync(mail);
+                await context.QueuedEmails.AddAsync(queuedEmail);
                 await context.SaveChangesAsync();
 
-                return mail.Id;
+                return queuedEmail.Id;
             }
         }
 
@@ -127,9 +125,11 @@ namespace Acme.Tools.EmailQueue
             {
                 using (var context = new QueuedEmailContext(this.ConnectionString))
                 {
-                    var emails = context.QueuedEmails.Where(x => x.Sent == null).ToList();
-                    foreach (var email in emails)
+                    var queuedEmails = context.QueuedEmails.Where(x => x.Sent == null).ToList();
+                    foreach (var queuedEmail in queuedEmails)
                     {
+                        var email = JsonConvert.DeserializeObject<Email>(queuedEmail.Email);
+
                         var message = new MailMessage();
                         message.From = new MailAddress(email.Sender);
                         message.Subject = email.Subject;
@@ -172,7 +172,7 @@ namespace Acme.Tools.EmailQueue
 
                         if (email.Attachments != null)
                         {
-                            var attachments = JsonConvert.DeserializeObject<MailAttachment[]>(email.Attachments);
+                            var attachments = JsonConvert.DeserializeObject<EmailAttachment[]>(email.Attachments);
                             foreach (var attachment in attachments)
                             {
                                 var a = new Attachment(new MemoryStream(attachment.FileData), attachment.FileName);
@@ -188,8 +188,8 @@ namespace Acme.Tools.EmailQueue
                         try
                         {
                             client.Send(message);
-                            email.Sent = DateTime.Now;
-                            email.ResultMessage = null;
+                            queuedEmail.Sent = DateTime.Now;
+                            queuedEmail.ResultMessage = null;
 
                             if (waitTime != 0)
                             {
@@ -198,7 +198,7 @@ namespace Acme.Tools.EmailQueue
                         }
                         catch (SmtpException e)
                         {
-                            email.ResultMessage = e.ToString();
+                            queuedEmail.ResultMessage = e.ToString();
                         }
 
                         context.SaveChanges();
