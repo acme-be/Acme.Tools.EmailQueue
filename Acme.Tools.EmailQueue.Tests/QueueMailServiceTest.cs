@@ -4,7 +4,9 @@
 
 namespace Acme.Tools.EmailQueue.Tests
 {
+    using System;
     using System.IO;
+    using System.Linq;
     using System.Net.Mail;
     using System.Threading.Tasks;
 
@@ -18,7 +20,7 @@ namespace Acme.Tools.EmailQueue.Tests
         /// <summary>
         /// Test the Enqueue method.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+        /// <returns>A <see cref="Task" /> representing the result of the asynchronous operation.</returns>
         [Fact]
         public async Task EnqueueOk()
         {
@@ -29,7 +31,7 @@ namespace Acme.Tools.EmailQueue.Tests
         /// <summary>
         /// Test the sending of the mail queue.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        /// <returns>A <see cref="Task" /> representing the asynchronous unit test.</returns>
         [Fact]
         public async Task SendQueuedMailsOk()
         {

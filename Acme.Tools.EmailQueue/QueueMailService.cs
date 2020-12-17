@@ -5,6 +5,7 @@
 namespace Acme.Tools.EmailQueue
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.IO;
     using System.Linq;
@@ -64,7 +65,7 @@ namespace Acme.Tools.EmailQueue
         /// <param name="adminCopy">If we must send a copy to the admin.</param>
         /// <param name="replyTo">The adresse to use in reply to.</param>
         /// <param name="attachments">The optional attachments.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation, with the guid associated to the email.</returns>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation, with the guid associated to the email.</returns>
         public async Task<Guid> EnqueueAsync(string sender, string title, string body, string recipient, bool adminCopy = false, string replyTo = null, params MailAttachment[] attachments)
         {
             sender.ThrowIfNull(nameof(sender));
@@ -72,22 +73,32 @@ namespace Acme.Tools.EmailQueue
             body.ThrowIfNull(nameof(body));
             recipient.ThrowIfNull(nameof(recipient));
 
+            var mail = new QueuedEmail();
+            mail.Id = Guid.NewGuid();
+            mail.Sender = sender;
+            mail.Recipients = new List<string> { recipient };
+            mail.ReplyTo = replyTo;
+            mail.Subject = title;
+            mail.Body = body;
+            mail.AdminCopy = adminCopy;
+
+            if (attachments != null)
+            {
+                mail.Attachments = JsonConvert.SerializeObject(attachments);
+            }
+
+            return await this.EnqueueAsync(mail);
+        }
+
+        /// <summary>
+        /// Enqueue an email and store it into the database.
+        /// </summary>
+        /// <param name="mail">The mail to be enqueued.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation, with the guid associated to the email.</returns>
+        public async Task<Guid> EnqueueAsync(QueuedEmail mail)
+        {
             using (var context = new QueuedEmailContext(this.ConnectionString))
             {
-                var mail = new QueuedEmail();
-                mail.Id = Guid.NewGuid();
-                mail.Sender = sender;
-                mail.Recipient = recipient;
-                mail.ReplyTo = replyTo;
-                mail.Subject = title;
-                mail.Body = body;
-                mail.AdminCopy = adminCopy;
-
-                if (attachments != null)
-                {
-                    mail.Attachments = JsonConvert.SerializeObject(attachments);
-                }
-
                 await context.QueuedEmails.AddAsync(mail);
                 await context.SaveChangesAsync();
 
@@ -125,7 +136,29 @@ namespace Acme.Tools.EmailQueue
                             message.ReplyToList.Add(new MailAddress(email.ReplyTo));
                         }
 
-                        message.To.Add(new MailAddress(email.Recipient));
+                        if (email.Recipients != null)
+                        {
+                            foreach (var recipient in email.Recipients)
+                            {
+                                message.To.Add(new MailAddress(recipient));
+                            }
+                        }
+
+                        if (email.RecipientsCopy != null)
+                        {
+                            foreach (var recipientCopy in email.RecipientsCopy)
+                            {
+                                message.CC.Add(new MailAddress(recipientCopy));
+                            }
+                        }
+
+                        if (email.RecipientsBlindCopy != null)
+                        {
+                            foreach (var recipientBlindCopy in email.RecipientsBlindCopy)
+                            {
+                                message.Bcc.Add(new MailAddress(recipientBlindCopy));
+                            }
+                        }
 
                         if (email.AdminCopy)
                         {

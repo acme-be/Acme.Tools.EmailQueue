@@ -5,6 +5,7 @@
 namespace Acme.Tools.EmailQueue
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;
 
@@ -35,19 +36,29 @@ namespace Acme.Tools.EmailQueue
         public Guid Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the result message.
-        /// </summary>
-        public string ResultMessage { get; set; }
-
-        /// <summary>
         /// Gets or sets the recipient.
         /// </summary>
-        public string Recipient { get; set; }
+        public List<string> Recipients { get; set; }
+
+        /// <summary>
+        /// Gets or sets the recipient that will receive a blind copy.
+        /// </summary>
+        public List<string> RecipientsBlindCopy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the recipient that will receive a copy.
+        /// </summary>
+        public List<string> RecipientsCopy { get; set; }
 
         /// <summary>
         /// Gets or sets the use to reply to.
         /// </summary>
         public string ReplyTo { get; set; }
+
+        /// <summary>
+        /// Gets or sets the result message.
+        /// </summary>
+        public string ResultMessage { get; set; }
 
         /// <summary>
         /// Gets or sets the sender.
