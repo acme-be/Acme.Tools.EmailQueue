@@ -97,6 +97,11 @@ namespace Acme.Tools.EmailQueue
         /// <returns>A <see cref="Task" /> representing the asynchronous operation, with the guid associated to the email.</returns>
         public async Task<Guid> EnqueueAsync(QueuedEmail mail)
         {
+            if (mail.Id == default(Guid))
+            {
+                mail.Id = Guid.NewGuid();
+            }
+
             using (var context = new QueuedEmailContext(this.ConnectionString))
             {
                 await context.QueuedEmails.AddAsync(mail);
