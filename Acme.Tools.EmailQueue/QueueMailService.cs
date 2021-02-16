@@ -32,15 +32,15 @@ namespace Acme.Tools.EmailQueue
         /// </summary>
         /// <param name="connectionString">The name of the connection string used by this service.</param>
         /// <param name="adminEmail">The admin email used when sending mails with copy.</param>
-        /// <param name="redirectEmail">if set to true, the mails will be redirected to the redirection adress</param>
-        /// <param name="redirectionAdress">The redirection adress which will be used if the redirectEmail parameter is set to true.</param>
-        public QueueMailService(string connectionString, string adminEmail = null, bool redirectEmail = false, string redirectionAdress = null)
+        /// <param name="redirectEmail">if set to true, the mails will be redirected to the redirection address</param>
+        /// <param name="redirectionAddress">The redirection address which will be used if the redirectEmail parameter is set to true.</param>
+        public QueueMailService(string connectionString, string adminEmail = null, bool redirectEmail = false, string redirectionAddress = null)
         {
             this.ConnectionString = connectionString;
             this.AdminEmail = adminEmail;
             this.CustomHeaders = new NameValueCollection();
             this.RedirectEmail = redirectEmail;
-            this.RedirectionAdress = redirectionAdress;
+            this.RedirectionAddress = redirectionAddress;
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Acme.Tools.EmailQueue
         /// <value>
         /// The redirection adress.
         /// </value>
-        public string RedirectionAdress { get; }
+        public string RedirectionAddress { get; }
 
         /// <summary>
         /// Enqueue an email and store it into the database.
@@ -192,11 +192,11 @@ namespace Acme.Tools.EmailQueue
 
                         if (this.RedirectEmail)
                         {
-                            var originalAdress = string.Join(", ", message.To.Select(x => x.Address));
-                            message.Subject += " (" + originalAdress + ")";
+                            var originalAddress = string.Join(", ", message.To.Select(x => x.Address));
+                            message.Subject += " (" + originalAddress + ")";
 
                             message.To.Clear();
-                            message.To.Add(new MailAddress(this.RedirectionAdress));
+                            message.To.Add(new MailAddress(this.RedirectionAddress));
                         }
 
                         if (email.Attachments != null)
