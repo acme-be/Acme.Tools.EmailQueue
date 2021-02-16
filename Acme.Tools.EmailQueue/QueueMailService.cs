@@ -32,8 +32,8 @@ namespace Acme.Tools.EmailQueue
         /// </summary>
         /// <param name="connectionString">The name of the connection string used by this service.</param>
         /// <param name="adminEmail">The admin email used when sending mails with copy.</param>
-        /// <param name="redirectEmail">if set to <c>true</c> [redirect email].</param>
-        /// <param name="redirectionAdress">The redirection adress.</param>
+        /// <param name="redirectEmail">if set to true, the mails will be redirected to the redirection adress</param>
+        /// <param name="redirectionAdress">The redirection adress which will be used if the redirectEmail parameter is set to true.</param>
         public QueueMailService(string connectionString, string adminEmail = null, bool redirectEmail = false, string redirectionAdress = null)
         {
             this.ConnectionString = connectionString;
