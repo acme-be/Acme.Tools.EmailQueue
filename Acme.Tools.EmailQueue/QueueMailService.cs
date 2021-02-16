@@ -32,11 +32,15 @@ namespace Acme.Tools.EmailQueue
         /// </summary>
         /// <param name="connectionString">The name of the connection string used by this service.</param>
         /// <param name="adminEmail">The admin email used when sending mails with copy.</param>
-        public QueueMailService(string connectionString, string adminEmail = null)
+        /// <param name="redirectEmail">if set to true, the mails will be redirected to the redirection address.</param>
+        /// <param name="redirectionAddress">The redirection address which will be used if the redirectEmail parameter is set to true.</param>
+        public QueueMailService(string connectionString, string adminEmail = null, bool redirectEmail = false, string redirectionAddress = null)
         {
             this.ConnectionString = connectionString;
             this.AdminEmail = adminEmail;
             this.CustomHeaders = new NameValueCollection();
+            this.RedirectEmail = redirectEmail;
+            this.RedirectionAddress = redirectionAddress;
         }
 
         /// <summary>
@@ -54,6 +58,22 @@ namespace Acme.Tools.EmailQueue
         /// </summary>
         /// <value>The CustomHeaders.</value>
         public NameValueCollection CustomHeaders { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether [redirect email].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [redirect email]; otherwise, <c>false</c>.
+        /// </value>
+        public bool RedirectEmail { get; }
+
+        /// <summary>
+        /// Gets the redirection adress.
+        /// </summary>
+        /// <value>
+        /// The redirection adress.
+        /// </value>
+        public string RedirectionAddress { get; }
 
         /// <summary>
         /// Enqueue an email and store it into the database.
@@ -168,6 +188,15 @@ namespace Acme.Tools.EmailQueue
                         if (email.AdminCopy)
                         {
                             message.To.Add(new MailAddress(this.AdminEmail));
+                        }
+
+                        if (this.RedirectEmail)
+                        {
+                            var originalAddress = string.Join(", ", message.To.Select(x => x.Address));
+                            message.Subject += " (" + originalAddress + ")";
+
+                            message.To.Clear();
+                            message.To.Add(new MailAddress(this.RedirectionAddress));
                         }
 
                         if (email.Attachments != null)
