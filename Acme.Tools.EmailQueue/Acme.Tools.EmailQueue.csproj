@@ -9,7 +9,7 @@
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageIcon>logo.png</PackageIcon>
         <RepositoryUrl>https://github.com/simonbaudart/Acme.Tools.EmailQueue</RepositoryUrl>
-        <PackageVersion>2.0.0</PackageVersion>
+        <PackageVersion>2.1.0</PackageVersion>
         <TargetFrameworks>net472;netstandard2.1;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     </PropertyGroup>
 
